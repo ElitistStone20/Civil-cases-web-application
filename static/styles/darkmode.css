@@ -1,0 +1,28 @@
+:root {
+    --dark-mode: #252323;
+    --dark-mode-grey: #464343;
+    --white-color: rgba(255, 255, 255, 0.87);
+}
+
+/*Dark Mode*/
+#dark-mode-toggle:checked ~ .main-content {
+    background-color: var(--dark-mode);
+    height: 100%;
+}
+
+#dark-mode-toggle:checked ~ .main-content header {
+    background: var(--dark-mode-grey);
+    border-bottom: 2px solid whitesmoke;
+    width:100%;
+    color: white;
+}
+
+#dark-mode-toggle:checked ~ .card-single {
+    box-shadow: 6px 6px 10px rgba(255, 253, 253, 0.932) !important;
+}
+
+#dark-mode-toggle:checked ~ .sidebar,
+#dark-mode-toggle:checked ~ .sidebar a {
+    color: black;
+}
+

@@ -1,0 +1,224 @@
+{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    {{ super() }} 
+    {% block userstyle %}{{ super() }}{% endblock %}  
+    <title>{{Dashboard_Type}}</title>
+    {% endblock %}
+</head>
+<body>
+    {% block content %}
+    {{ super() }}
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3 class="brand">
+                <span class="ti-server"></span>
+                <span>{{Dashboard_Type}}</span>
+            </h3>
+            <label for="sidebar-toggle" class="ti-menu-alt"></label>
+        </div>
+        <div class="sidebar-menu">
+            <ul>     
+                <li>
+                    <a href="#cases">
+                        <span class="ti-book"></span>
+                        <span>Total Cases</span>
+                    </a>
+                </li>         
+                <li>
+                    <a href="#barrister-cases">
+                        <span class="ti-briefcase"></span>
+                        <span>Your Cases</span>
+                    </a>
+                </li>                           
+                <li>
+                    <a href="/">
+                        <span class="ti-power-off"></span>
+                        <span>Logout</span>
+                    </a>
+                </li>                     
+            </ul>
+        </div>
+    </div>
+    <div class="main-content" id="main">
+        {% block header %}
+        {{ super() }}
+        {% endblock %}
+        <main>
+            <h2 class="dash-title">Overview</h2>
+            <div class="dash-cards">
+                <div class="card-single">
+                    <div class="card-body">
+                        <span class="ti-briefcase"></span>
+                        <div>
+                            <h5>Assigned Cases</h5>
+                            <h4>{{ user_cases|length }}</h4>
+                        </div>
+                    </div>               
+                </div>
+                <div class="card-single">
+                    <div class="card-body">
+                        <span class="ti-briefcase"></span>
+                        <div>
+                            <h5>Number of unfinished cases</h5>
+                            <h4>{{ unfinished }}</h4>
+                        </div>
+                    </div>                  
+                </div>   
+                <div class="card-single">
+                    <div class="card-body">
+                        <span class="ti-briefcase"></span>
+                        <div>
+                            <h5>Total Cases</h5>
+                            <h4>{{ cases|length }}</h4>
+                        </div>
+                    </div>               
+                </div>                           
+            </div>           
+            <section class="cases" id="barrister-cases">
+                <div class="activity-grid">
+                    <div class="activity-card">
+                        <div class="table-header">
+                            <h3>Your Cases</h3>                               
+                        </div>               
+                        <div class="table-responsive">
+                            <div class="search-box">
+                                <form class="input-group" onsubmit="return(validate_search_assign());" method="POST">
+                                    <input type="text" class="input-field" id="search-assigned" name="search-case" placeholder="Search by ID....." required>   
+                                    <button type="submit" class="ti-search" name="submit" value="search-assigned-cases"></button>
+                                </form>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Claim Number</th>
+                                        <th>Case Title</th>
+                                        <th>Case Status</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>   
+                                        <th>Case Description</th>  
+                                        <th>Result of the case</th>      
+                                        <th>Case Type</th>  
+                                        <th>Client</th>
+                                        <th>Solicitor</th>  
+                                        <th>Court</th>                              
+                                        <th> </th>     
+                                    </tr>
+                                </thead>      
+                                <tbody>
+                                    {% for case in user_cases %}
+                                    <tr>
+                                        <td>{{ case.0 }}</td>
+                                        <td>{{ case.1 }}</td>
+                                        <td>{{ case.2 }}</td>
+                                        <td>{{ case.3 }}</td>
+                                        <td>{{ case.4 }}</td>
+                                        <td>{{ case.5 }}</td>
+                                        <td>{{ case.6 }}</td>
+                                        <td>{{ case.7 }}</td>
+                                        <td>
+                                            {% for client in clients %}
+                                                {% if client.0 == case.8 %}
+                                                    {{ client.1|string + " " + client.2|string + " " + client.3|string + " " + client.4|string }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            {% for sol in solicitors %}
+                                                {% if sol.0 == case.9 %}
+                                                    {{ sol.1|string + " " + sol.2|string + " " + sol.3|string + " " + sol.4|string }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>   
+                                        <td>
+                                            {% for court in courts %}
+                                                {% if court.0 == case.10 %}
+                                                    {{ court.1 }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>                                     
+                                    </tr>    
+                                    {% endfor %}                                                      
+                                </tbody>                     
+                            </table>                     
+                        </div>                           
+                    </div>                   
+                </div>  
+            </section>
+            <section class="cases" id="cases">
+                <div class="activity-grid">
+                    <div class="activity-card">
+                        <h3>All Cases</h3>                       
+                        <div class="table-responsive">
+                            <div class="search-box">
+                                <form class="input-group" onsubmit="return (validate_search_all());" method="POST">
+                                    <input type="text" class="input-field" id="search-cases" name="search-case" placeholder="Search by ID....." required>   
+                                    <button type="submit" class="ti-search" name="submit" value="search-cases"></button>
+                                </form>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Claim Number</th>
+                                        <th>Case Title</th>
+                                        <th>Case Status</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>   
+                                        <th>Case Description</th>  
+                                        <th>Result of the case</th>      
+                                        <th>Case Type</th> 
+                                        <th>Solicitor</th>
+                                        <th>Client</th>
+                                        <th>Court</th>
+                                        <th> </th>      
+                                    </tr>
+                                </thead>      
+                                <tbody>
+                                    {% for case in cases %}
+                                    <tr>
+                                        <td>{{ case.0 }}</td>
+                                        <td>{{ case.1 }}</td>
+                                        <td>{{ case.2 }}</td>
+                                        <td>{{ case.3 }}</td>
+                                        <td>{{ case.4 }}</td>
+                                        <td>{{ case.5 }}</td>
+                                        <td>{{ case.6 }}</td>
+                                        <td>{{ case.7 }}</td>
+                                        <td>
+                                        {% for sol in solicitors %}
+                                            {% if sol.0 == case.9 %}
+                                                {{ sol.1|string + " " + sol.2|string + " " + sol.3|string + " " + sol.4|string }}
+                                            {% endif %}
+                                        {% endfor %}
+                                        </td>
+                                        <td>
+                                            {% for client in clients %}
+                                                {% if client.0 == case.10 %}
+                                                    {{ client.1|string + " " + client.2|string + " " + client.3|string + " " + client.4|string }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            {% for court in courts %}
+                                                {% if court.0 == case.10 %}
+                                                    {{ court.1 }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                    </tr>    
+                                    {% endfor %}                                                      
+                                </tbody>                     
+                            </table>                     
+                        </div>                           
+                    </div>                   
+                </div>  
+            </section>
+        </main>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{{url_for('static', filename='Scripts/bar_sol_scripts.js')}}"></script>
+    {% endblock %}
+</body>
+</html>

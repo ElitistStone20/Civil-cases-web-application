@@ -1,0 +1,567 @@
+{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    {{ super() }}
+    {% block adminstyle %}{{ super() }}{% endblock %}
+    <title>Admin Dashboard</title>
+    {% endblock %}
+</head>
+<body>
+    {% block content %}
+    {{ super() }}
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3 class="brand">
+                <span class="ti-server"></span>
+                <span>Admin</span>
+            </h3>
+            <label for="sidebar-toggle" class="ti-menu-alt"></label>
+        </div>
+        <div class="sidebar-menu">
+            <ul>
+                <li>
+                    <a href="#main">
+                        <span class="ti-harddrives"></span>
+                        <span>Overview</span>
+                    </a>
+                </li> 
+                <li>
+                    <a href="#barristers">
+                        <span class="ti-user"></span>
+                        <span>Barristers</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#solicitors">
+                        <span class="ti-user"></span>
+                        <span>Solicitors</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#courts">
+                        <span class="ti-home"></span>
+                        <span>Courts</span>
+                    </a>
+                </li>    
+                <li>
+                    <a href="#addresses">
+                        <span class="ti-book"></span>
+                        <span>Addresses</span>
+                    </a>
+                </li>   
+                <li>
+                    <a href="#cases">
+                        <span class="ti-archive"></span>
+                        <span>Cases</span>
+                    </a>
+                </li>    
+                <li>
+                    <a href="#clients">
+                        <span class="ti-id-badge"></span>
+                        <span>Clients</span>
+                    </a>
+                </li>  
+                <li>
+                    <a href="/">
+                        <span class="ti-power-off"></span>
+                        <span>Logout</span>
+                    </a>
+                </li>                     
+            </ul>
+        </div>
+    </div>
+    <div class="main-content" id="main">
+        {% block header %}
+        {{ super() }}
+        {% endblock %}
+        <main>
+            <h2 class="dash-title">Overview</h2>
+            <div class="dash-cards">
+                <div class="card-single">
+                    <div class="card-body">
+                        <span class="ti-user"></span>
+                        <div>
+                            <h5>Number of Barristers</h5>
+                            <h4>{{ barristers|length }}</h4>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#barristers">View All</a>
+                    </div>
+                </div>
+                <div class="card-single">
+                    <div class="card-body">
+                        <span class="ti-user"></span>
+                        <div>
+                            <h5>Number of Solicitors</h5>
+                            <h4>{{ solicitors|length }}</h4>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#solicitors">View All</a>
+                    </div>
+                </div>
+                <div class="card-single">
+                    <div class="card-body">
+                        <span class="ti-home"></span>
+                        <div>
+                            <h5>Number of Courts</h5>
+                            <h4>{{ courts|length }}</h4>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#courts">View All</a>
+                    </div>
+                </div>  
+                <div class="card-single">
+                    <div class="card-body">
+                        <span class="ti-book"></span>
+                        <div>
+                            <h5>Number of Addresses</h5>
+                            <h4>{{ addresses|length }}</h4>
+                        </div>
+                    </div>   
+                    <div class="card-footer">
+                        <a href="#addresses">View All</a>
+                    </div>                
+                </div>         
+                <div class="card-single">
+                    <div class="card-body">
+                        <span class="ti-briefcase"></span>
+                        <div>
+                            <h5>Number of Cases</h5>
+                            <h4>{{ cases|length }}</h4>
+                        </div>
+                    </div>     
+                    <div class="card-footer">
+                        <a href="#cases">View All</a>
+                    </div>                     
+                </div>       
+                <div class="card-single">
+                    <div class="card-body">
+                        <span class="ti-briefcase"></span>
+                        <div>
+                            <h5>Number of Clients</h5>
+                            <h4>{{ clients|length }}</h4>
+                        </div>
+                    </div>  
+                    <div class="card-footer">
+                        <a href="#clients">View All</a>
+                    </div>                  
+                </div>                                                      
+            </div>           
+            <section class="barristers" id="barristers">
+                <div class="activity-grid">
+                    <div class="activity-card">
+                        <h3>Barristers</h3>
+                        <div class="table-responsive">
+                            <div class="search-box">
+                                <form class="input-group" method="POST">
+                                    <input type="text" class="input-field" name="search-barrister" placeholder="Search by bar council number...." required>
+                                    <button type="submit" class="ti-search" name="submit" value="search-barristers"></button>
+                                </form>
+                            </div>
+                            <table id="barristers">
+                                <thead>
+                                    <tr>
+                                        <th>Bar Council Number</th>
+                                        <th>Title</th>
+                                        <th>Firstname</th>
+                                        <th>Middlename</th>
+                                        <th>Surname</th>
+                                        <th>Password</th>        
+                                        <th>Phone Number</th> 
+                                        <th>Address</th>
+                                        <th> </th>    
+                                        <th> </th>     
+                                    </tr>
+                                </thead>      
+                                <tbody>
+                                    {% for row in barristers %}
+                                        <tr>
+                                            <td>{{ row.0 }}</td>
+                                            <td>{{ row.1 }}</td>
+                                            <td>{{ row.2 }}</td>
+                                            <td>{{ row.3 }}</td>
+                                            <td>{{ row.4 }}</td>
+                                            <td>{{ row.5 }}</td>
+                                            <td>{{ row.6 }}</td>
+                                            <td>
+                                                {% for address in addresses %}
+                                                    {% if address.0 == row.7 %}
+                                                        {{ address.1|string + " " + address.2 + ", " + address.3 + ", " + address.4 + ", " + address.5 }}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td><button type="button" class="edit-button" id="barrister-edit">Edit</button></td>
+                                            <td><button type="button" class="delete-button">Delete</button></td>
+                                        </tr>
+                                    {% endfor %}                
+                                </tbody>                     
+                            </table>                     
+                        </div>                           
+                    </div>                   
+                </div>  
+                <div class="form-box">
+                    <h3>Create or Edit a Barrister</h3>
+                    <form name="barrister-update" class="input-group" onsubmit="return(validate_barrister_submission());" method="POST">                   
+                        <input type="text" class="input-field" id="bar-council" name="bar-council" placeholder="Bar Council Number" required>
+                        <input type="text" class="input-field" id="title-barrister" name="barrister-title" placeholder="Title" required>
+                        <input type="text" class="input-field" id="first-name-barrister" name="barrister-firstname" placeholder="Firstname" required>
+                        <input type="text" class="input-field" id="middle-name-barrister" name="barrister-middlename" placeholder="Middle name">
+                        <input type="text" class="input-field" id="surname-barrister" name="barrister-surname" placeholder="Surname" required>
+                        <input type="text" class="input-field" id="password-barrister" name="barrister-password" placeholder="Password" required>              
+                        <input type="text" class="input-field" id="phonenumber-barrister" name="barrister-phonenumber" placeholder="Phone number" required>
+                        <select class="combo-box" id="barrister-combo" name="address_selection">
+                            {% for row in addresses %}
+                                <option>{{ row.1|string + " " + row.2 + ", " + row.3 + ", " + row.4 + ", " + row.5 }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" name="submit" value="barrister-save">Save</button>
+                        <button type="reset" class="reset-barrister-btn">Reset</button>
+                    </form>   
+                </div>               
+            </section>
+            <section class="solicitors" id="solicitors">
+                <div class="activity-grid">
+                    <div class="activity-card">
+                        <h3>Solicitors</h3>
+                        <div class="table-responsive">
+                            <div class="search-box">
+                                <form class="input-group" method="POST">
+                                    <input type="text" class="input-field" name="search-solicitors" placeholder="Search by reference number...." required>
+                                    <button type="submit" class="ti-search" name="submit" value="search-solicitors"></button>
+                                </form>
+                            </div>
+                            <table id="solicitors">
+                                <thead>
+                                    <tr>
+                                        <th>Reference ID</th>
+                                        <th>Title</th>
+                                        <th>Firstname</th>
+                                        <th>Middlename</th>
+                                        <th>Surname</th>
+                                        <th>Password</th>     
+                                        <th> </th>   
+                                        <th> </th>        
+                                    </tr>
+                                </thead>      
+                                <tbody>
+                                    {% for row in solicitors %}
+                                    <tr>
+                                        <td>{{row.0}}</td>
+                                        <td>{{ row.1 }}</td>
+                                        <td>{{ row.2 }}</td>
+                                        <td>{{ row.3 }}</td>
+                                        <td>{{row.4}}</td> 
+                                        <td>{{row.5}}</td>   
+                                        <td><button type="button" class="edit-button">Edit</button></td>    
+                                        <td><button type="button" class="delete-button">Delete</button></td>                        
+                                    </tr>   
+                                    {% endfor %}                                               
+                                </tbody>                     
+                            </table>       
+                        </div>             
+                    </div>                   
+                </div>  
+                <div class="form-box">
+                    <h3>Create or Edit a Solicitor</h3>
+                    <form id="solicitor-update" class="input-group" onsubmit="return(validate_solicitor_submission());" method="POST">                   
+                        <input type="text" class="input-field" id="reference-id" name="reference-id" placeholder="Reference ID" required>
+                        <input type="text" class="input-field" id="title-solicitor" name="solicitor-title" placeholder="Title" required>
+                        <input type="text" class="input-field" id="firstname-solicitor" name="solicitor-firstname" placeholder="Firstname" required>
+                        <input type="text" class="input-field" id="middle-name-solicitor" name="solicitor-middlename" placeholder="Middle name">
+                        <input type="text" class="input-field" id="surname-solicitor" name="solicitor-surname" placeholder="Surname" required>
+                        <input type="text" class="input-field" id="password-solicitor" name="solicitor-password" placeholder="Password" required>
+                        <button type="submit" name="submit" value="solicitor-save">Save</button>
+                        <button type="reset" class="reset-solicitor-btn">Reset</button>            
+                    </form>   
+                </div>                 
+            </section>
+            <section class="courts" id="courts">
+                <div class="activity-grid">
+                    <div class="activity-card">
+                        <h3>Courts</h3>
+                        <div class="table-responsive">
+                            <div class="search-box">
+                                <form class="input-group" method="POST">
+                                    <input type="text" class="input-field" name="search-courts" placeholder="Search by court name...." required>
+                                    <button type="submit" class="ti-search" name="submit" value="search-courts"></button>
+                                </form>
+                            </div>
+                            <table id="courts">
+                                <thead>
+                                    <tr>
+                                        <th>Court ID</th>
+                                        <th>Court Name</th>
+                                        <th>Username</th>      
+                                        <th>Password</th>  
+                                        <th>Court Type</th>
+                                        <th> </th>     
+                                        <th> </th>                                       
+                                    </tr>
+                                </thead>      
+                                <tbody>
+                                    {% for row in courts %}
+                                    <tr>
+                                        <td>{{row.0}}</td>
+                                        <td>{{row.1}}</td>
+                                        <td>{{row.2}}</td>       
+                                        <td>{{row.3}}</td>  
+                                        <td>{{row.4}}</td>  
+                                        <td><button type="button" class="edit-button">Edit</button></td>   
+                                        <td><button type="button" class="delete-button">Delete</button></td>                  
+                                    </tr>    
+                                    {% endfor %}                                                    
+                                </tbody>                     
+                            </table>            
+                        </div>        
+                    </div>                   
+                </div>  
+                <div class="form-box">
+                    <h3>Create or Edit a Court</h3>
+                    <form id="court-update" class="input-group" method="POST">                   
+                        <input readlonly type="text" class="input-field" id="court-id" name="court-id" placeholder="Court ID" required>
+                        <input type="text" class="input-field" id="court-name" name="court-name" placeholder="Court name" required>
+                        <input type="text" class="input-field" id="court-user-name" name="court-username" placeholder="Username" required>
+                        <input type="text" class="input-field" id="court-password" name="court-password" placeholder="Password" required>
+                        <input type="text" class="input-field" id="combo-box" name="court-type" placeholder="Select a court type" required>
+                        <select name="court-list" class="combo-box" onchange="combo(this, 'combo-box')">
+                            {% for option in court_options %}
+                                <option>{{ option }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" name="submit" value="court-save">Save</button>
+                        <button type="reset" class="reset-court-btn">Reset</button>            
+                    </form>   
+                </div>               
+            </section>
+            <section class="addresses" id="addresses">
+                <div class="activity-grid">
+                    <div class="activity-card">
+                        <h3>Addresses</h3>
+                        <div class="table-responsive">
+                            <div class="search-box">
+                                <form class="input-group" method="POST">
+                                    <input type="text" class="input-field" name="search-addresses" placeholder="Search by full address...." required>
+                                    <button type="submit" class="ti-search" name="submit" value="search-addresses"></button>
+                                </form>
+                            </div>
+                            <table id="addresses">
+                                <thead>
+                                    <tr>     
+                                        <th>Address ID</th>                             
+                                        <th>House Number</th>
+                                        <th>Street Name</th>      
+                                        <th>Town Name</th>  
+                                        <th>City</th>  
+                                        <th>Country</th>  
+                                        <th>Postcode</th>  
+                                        <th> </th>    
+                                        <th> </th>                                        
+                                    </tr>
+                                </thead>      
+                                <tbody>
+                                    {% for row in addresses %}
+                                    <tr>     
+                                        <td>{{row.0}}</td>                              
+                                        <td>{{row.1}}</td>
+                                        <td>{{row.2}}</td>       
+                                        <td>{{row.3}}</td>    
+                                        <td>{{row.4}}</td>  
+                                        <td>{{row.5}}</td>   
+                                        <td>{{row.6}}</td>    
+                                        <td><button type="button" class="edit-button">Edit</button></td>  
+                                        <td><button type="button" class="delete-button">Delete</button></td>                   
+                                    </tr>    
+                                    {% endfor %}                                                    
+                                </tbody>                     
+                            </table>            
+                        </div>        
+                    </div>                   
+                </div>  
+                <div class="form-box">
+                    <h3>Create or Edit an Address</h3>
+                    <form id="address-update" class="input-group" onsubmit="return(validate_address_submission());" method="POST">    
+                        <input readonly type="text" class="input-field" id="address-id" name="address-id" placeholder="Address ID" required>             
+                        <input type="text" class="input-field" id="house-number" name="house-number" placeholder="House Number" required>
+                        <input type="text" class="input-field" id="street-name" name="street-name" placeholder="Street Name" required>
+                        <input type="text" class="input-field" id="town-name" name="town-name" placeholder="Town Name" required>
+                        <input type="text" class="input-field" id="city" name="city" placeholder="City" required>
+                        <input type="text" class="input-field" id="country" name="country" placeholder="Country" required>
+                        <input type="text" class="input-field" id="postcode" name="postcode" placeholder="Postcode" required>
+                        <input type="hidden" class="input-field">
+                        <button type="submit" name="submit" value="address-save">Save</button>
+                        <button type="reset" class="reset-address-btn">Reset</button>            
+                    </form>   
+                </div>               
+            </section>
+            <section class="cases" id="cases">
+                <div class="activity-grid">
+                    <div class="activity-card">
+                        <h3>Cases</h3>                       
+                        <div class="table-responsive">
+                            <div class="search-box">
+                                <form class="input-group" method="POST">
+                                    <input type="text" class="input-field" name="search-cases" placeholder="Search by ID...." required>
+                                    <button type="submit" class="ti-search" name="submit" value="search-cases"></button>
+                                </form>
+                            </div>
+                            <table id="cases">
+                                <thead>
+                                    <tr>
+                                        <th>Claim Number</th>
+                                        <th>Case Title</th>
+                                        <th>Case Status</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>   
+                                        <th>Case Description</th>  
+                                        <th>Result of the case</th>      
+                                        <th>Case Type</th>
+                                        <th>Solicitor</th>
+                                        <th>Client</th>                                        
+                                        <th> </th>    
+                                        <th> </th>   
+                                    </tr>
+                                </thead>      
+                                <tbody>
+                                    {% for case in cases %}
+                                    <tr>
+                                        <td>{{ case.0 }}</td>
+                                        <td>{{ case.1 }}</td>
+                                        <td>{{ case.2 }}</td>
+                                        <td>{{ case.3 }}</td>
+                                        <td>{{ case.4 }}</td>
+                                        <td>{{ case.5 }}</td>
+                                        <td>{{ case.6 }}</td>
+                                        <td>{{ case.7 }}</td>
+                                        <td>
+                                            {% for sol in solicitors %}
+                                                {% if sol.0 == case.9 %}
+                                                    {{ sol.1|string + " " + sol.2|string + " " + sol.3|string + " " + sol.4|string }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            {% for client in clients %}
+                                                {% if client.0 == case.10 %}
+                                                    {{ client.1|string + " " + client.2|string + " " + client.3|string + " " + client.4|string }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td><button type="button" class="edit-button">Edit</button></td>  
+                                        <td><button type="button" class="delete-button">Delete</button></td>  
+                                    </tr>    
+                                    {% endfor %}                                                      
+                                </tbody>                     
+                            </table>                     
+                        </div>                           
+                    </div>                   
+                </div>  
+                <div class="form-box">
+                    <h3>Create or Edit a Case</h3>
+                    <form id="case-update" class="input-group" onsubmit="return(validate_case_submission());" method="POST">                   
+                        <input readonly type="text" class="input-field" id="claim-id" name="claim-id" placeholder="Claim Number" required>
+                        <input type="text" class="input-field" id="case-title" name="case-title" placeholder="Case title" required>
+                        <input type="text" class="input-field" id="status" name="case-status" placeholder="Status">
+                        <input type="text" class="input-field" id="start-date" name="case-start-date" placeholder="Start date">
+                        <input type="text" class="input-field" id="end-date" name="case-end-date" placeholder="End date">
+                        <input type="text" class="input-field" id="description" name="case-description" placeholder="Description">
+                        <input type="text" class="input-field" id="result-of-case" name="case-result" placeholder="Result of case">
+                        <input type="text" class="input-field" id="type" name="case-type" placeholder="Case type">     
+                        <select class="combo-box" id="case-solicitor">
+                            {% for sol in solicitors %}
+                                <option>{{ sol.1|string + " " + sol.2|string + " " + sol.3|string + " " + sol.4|string }}</option>
+                            {% endfor %}
+                        </select>
+                        <select class="combo-box" id="case-client">
+                            {% for client in clients %}
+                                <option>{{ client.1|string + " " + client.2|string + " " + client.3|string + " " + client.4|string }}</option>
+                            {% endfor %}
+                        </select>       
+                        <button type="submit" name="submit" value="case-save">Save</button>                          
+                        <button type="reset" class="reset-case-btn">Reset</button>            
+                    </form>   
+                </div>               
+            </section>
+            <section class="clients" id="clients">
+                <div class="activity-grid">
+                    <div class="activity-card">
+                        <h3>Clients</h3>                       
+                        <div class="table-responsive">
+                            <div class="search-box">
+                                <form class="input-group" method="POST">
+                                    <input type="text" class="input-field" name="search-clients" placeholder="Search by full name...." required>
+                                    <button type="submit" class="ti-search" name="submit" value="search-clients"></button>
+                                </form>
+                            </div>
+                            <table id="clients">
+                                <thead>
+                                    <tr>
+                                        <th>Client ID</th>
+                                        <th>Title</th>
+                                        <th>Firstname</th>
+                                        <th>Middlename</th>
+                                        <th>Surname</th>   
+                                        <th>Date of birth</th>  
+                                        <th>Phone number</th>      
+                                        <th>Address</th> 
+                                        <th> </th>    
+                                        <th> </th>   
+                                    </tr>
+                                </thead>      
+                                <tbody>
+                                    {% for client in clients %}
+                                    <tr>
+                                        <td>{{ client.0 }}</td>
+                                        <td>{{ client.1 }}</td>
+                                        <td>{{ client.2 }}</td>
+                                        <td>{{ client.3 }}</td>
+                                        <td>{{ client.4 }}</td>
+                                        <td>{{ client.5 }}</td>
+                                        <td>{{ client.6 }}</td>
+                                        <td>
+                                            {% for address in addresses %}
+                                                {% if address.0 == client.7 %}
+                                                    {{ address.1|string + " " + address.2 + ", " + address.3 + ", " + address.4 + ", " + address.5 }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td><button type="button" class="edit-button">Edit</button></td>  
+                                        <td><button type="button" class="delete-button">Delete</button></td>  
+                                    </tr>    
+                                    {% endfor %}                                                      
+                                </tbody>                     
+                            </table>                     
+                        </div>                           
+                    </div>                   
+                </div>  
+                <div class="form-box">
+                    <h3>Create or Edit a Client</h3>
+                    <form id="client-update" class="input-group" method="POST">                   
+                        <input readonly type="text" class="input-field" id="client-id" name="client-id" placeholder="Client ID" required>
+                        <input type="text" class="input-field" id="client-title" name="client-title" placeholder="Client title" required>
+                        <input type="text" class="input-field" id="client-firstname" name="client-firstname" placeholder="Client-firstname" required>
+                        <input type="text" class="input-field" id="client-middlename" name="client-middlename" placeholder="Client-middlename" required>
+                        <input type="text" class="input-field" id="client-surname" name="client-surname" placeholder="Client surname" required>
+                        <input type="text" class="input-field" id="client-dob" name="client-dob" placeholder="Date of birth" required>
+                        <input type="text" class="input-field" id="client-phonenumber" name="client-phonenumber" placeholder="Phonenumber" required>
+                        <select class="combo-box" id="client-address" name="address_selection">
+                            {% for row in addresses %}
+                                <option>{{ row.1|string + " " + row.2 + ", " + row.3 + ", " + row.4 + ", " + row.5 }}</option>
+                            {% endfor %}
+                        </select>          
+                        <button type="submit" name="submit" value="case-save">Save</button>                          
+                        <button type="reset" class="reset-case-btn">Reset</button>            
+                    </form>   
+                </div>               
+            </section>
+        </main>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{{url_for('static', filename='Scripts/adminscripts.js')}}"></script>
+    {% endblock %}
+</body>
+</html>

@@ -1,0 +1,8 @@
+:root {
+    --visually-impaired-main-color: linear-gradient(to right, #080808, #4b4b4a);
+}
+
+/*Visually Impaired*/
+#visually-impaired-toggle:checked ~ .sidebar {
+    background: var(--visually-impaired-main-color);
+}

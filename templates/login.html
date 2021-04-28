@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login</title>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/loginstyle.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="hero">        
+        <div class="form-box">          
+            <div class="button-box">
+                <div id="btn"></div>
+                <button type="button" class="toggle-btn" onclick="login()">Log in</button>
+                <button type="button" class="toggle-btn" onclick="register()">Register</button>
+            </div>   
+            <div class="user-icon">
+                <img src="{{url_for('static', filename='styles/UserIcon.png')}}">
+            </div>    
+            <form id= "login" class="input-group" method="POST">              
+                <input type="text" class="input-field" name="identification" title="Enter your unique identification number" placeholder="Identification Number" required>                                        
+                <input type="password" class="input-field" name="password" title="Enter password here" placeholder="Password" required>    
+                {% if incorrect %}
+                    <p id="login-error">{{ incorrect }}</p>      
+                {% endif %}     
+                <button type="submit" class="submit-btn" name="submit" value="login">Log in</button>
+            </form>
+            <form id="register" class="input-group" onsubmit="return(validate());" method="POST">
+                <input type="text" class="input-field" title="Enter your unique identification number" id="identification" name="identification" placeholder="Identification Number" required>                                            
+                <input type="text" class="input-field" title="Enter a password of your choice here" id="password-main" name="password-main" placeholder="Password" required>     
+                <input type="text" class="input-field" title="Re-type your password to ensure they match" id="password-verify" name="password-verify" placeholder="Verify Password" required>   
+                <input type="text" class="input-field" id="combobox" name="combobox" placeholder="Select option from the list below" onchange="check_type_change()" required>  
+                <select name="register-list" class="input-field" id="selection_box" onchange="combo(this, 'combobox')">                    
+                    <option>Barrister</option>
+                    <option>Solicitor</option>
+                    <option>Court</option>
+                </select>
+                <p id="error-message"></p>
+                {% if exists %}
+                    <p id="login-error">{{ exists }}</p>
+                {% endif %}
+                <button type="submit" class="submit-btn" name="submit" value="register">Register</button>               
+            </form>          
+        </div>            
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="{{url_for('static', filename='Scripts/login.js')}}"></script>
+</body>
+</html>
