@@ -1,87 +1,92 @@
-import nltk
+# General imports
+import csv
 import re
-import string
-from pprint import pprint
+import pandas as pd
+import numpy as np
+import seaborn as sns
+
+# NLTK imports
+import nltk
+from nltk.stem import WordNetLemmatizer
+
+# Sklearn imports
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn import svm
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.model_selection import train_test_split
+
+# Graph settings
+confusion_matrix = False
+comparison_accuracy = True
+plot_svm = False
 
 
-class NLP(object):
-    def __init__(self):
-        self.CONTRACTION_MAP = {
-            "isn't": "is not",
-            "aren't": "are not",
-            "can't": "cannot",
-            "can't've": "cannot have",
-            "could've": "could have",
-            "didn't": "did not",
-            "doesn't": "does not",
-            "you'll've": "you will have",
-            "you're": "you are",
-            "you've": "you have",
-            "we're" : "we are",
-            "haven't": "have not",
-            "hasn't": "has not",
-            "how'll": "how will",
-            "i'd": "i had",
-            "i'll": "i will",
-        } 
+def classify_case(dataset, categories):
+    def SVM():
+        clf = svm.SVC(kernel='linear', C=5, shrinking=False, probability=True)
+        # Train the model
+        clf.fit(train_cases , np.ravel(categories, order='C'))
+        classification = clf.predict(case_to_classify)
+        print(classification)
+        return classification
+
+    train_cases = dataset.iloc[:len(dataset)-2]
+    case_to_classify = np.reshape(dataset.iloc[-1], (-1, 2))
+    print(case_to_classify)
+    return SVM()
+
+# Bag of words extraction of features
+def extract_features(documents):
+    def bag_of_words():
+        tfidf = TfidfVectorizer()
+        features = tfidf.fit_transform(documents)
+        return pd.DataFrame(
+            features.todense(),
+            columns=tfidf.get_feature_names()
+        )
+    return bag_of_words()
 
 
-    def normalise_corpus(self, corpus, tokenize=False):
-        # Tokenize the text after processing is done
-        def tokenize_text(text_to_process):
-            sentences = nltk.sent_tokenize(text_to_process)
-            word_tokens = [nltk.word_tokenize(sentence) for sentence in sentences]
-            return word_tokens
-
-        # Removing special characters with no relevance to the text
-        def remove_special_chars(sentence):
-            sentence = sentence.strip()    
-            PATTERN = r'[?|$|&|*|%|@|(|)|~]'
-            filtered_sentence = re.sub(PATTERN, r'', sentence)
-            return filtered_sentence
-        
-
-        def expand_contractions(sentence, contraction_map):
-            contractions_pattern = re.compile('({0})'.format('|'.join(self.CONTRACTION_MAP.keys())), flags=re.IGNORECASE|re.DOTALL)
-
-            def expand_match(contraction):
-                match = contraction.group(0)
-                first_car = match[0]
-                expanded_contraction = self.CONTRACTION_MAP.get(match) \
-                                       if self.CONTRACTION_MAP.get(match) \
-                                       else self.CONTRACTION_MAP.get(match.lower())
-                expanded_contraction = first_car + expanded_contraction[1:]
-                return expanded_contraction
-            
-            expanded_sentence = contraction_map.sub(expand_match, sentence)
-            return expanded_sentence
-        
-        def remove_stopwords(tokens):
-            stopword_list = nltk.corpus.stopwords.words('english')
-            filtered_tokens = [token for token in tokens if token not in stopword_list]
-            return filtered_tokens
+def encode_categories(categories):
+    encoder = OneHotEncoder(handle_unknown='ignore')
+    encoded_categories = encoder.fit_transform(categories).toarray()
+    return encoded_categories
 
 
-        def convert_case(sentence):
-            return sentence.lower()
-        
+def normalise_document(documents):
+    def lemitize_corpus(text):
+        lemitize = WordNetLemmatizer()
+        return lemitize.lemmatize(text)
 
-        normalised_corpus = []
-        for text in corpus:
-            text = convert_case(text)
-            text = expand_contractions(text, self.CONTRACTION_MAP)
-            text = remove_special_chars(text)
-            text = remove_stopwords(text)
-            if tokenize:
-                text = tokenize_text(text)
-            normalised_corpus.append(text)
-        return normalised_corpus
-    
+    def remove_special_characters(corpus):
+        pattern = r'[?|$|&|*|%|@|(|)|~|,|.|/|“|’|;|:]'
+        return re.sub('[\W\_]', ' ', ' '.join(corpus))
 
-    def classify_case(self, case):
-        case_type = ""
-        normalised_corpus = self.normalise_corpus(case, True)
-        return case_type
+    def remove_stopwords(document):
+        document = document.split(' ')
+        stopword_list = nltk.corpus.stopwords.words('english')
+        filtered_tokens = [token for token in document if token not in stopword_list]
+        return filtered_tokens
 
+    normalised_corpus = remove_stopwords(documents)
+    normalised_corpus = remove_special_characters(normalised_corpus)
+    normalised_corpus = lemitize_corpus(normalised_corpus)
+    return normalised_corpus
 
 
+def load_categories(data_set):
+    categories = []
+    for category in data_set['Category']:
+        categories.append([category])
+    return categories[:-1]
+
+
+def classify(description):
+    data_set = pd.read_csv('./Cases_Dataset.csv')
+    corpus = []
+    for i in data_set['Particulars of the Claim'].values.tolist():
+        corpus.append(normalise_document(i.lower()))
+    corpus.append(description.lower())
+    categories = load_categories(data_set)
+    extracted_corpus = extract_features(corpus)
+    return classify_case(extracted_corpus, categories)

@@ -2,7 +2,7 @@
 class DatabaseConfig(object):
     dbhost = 'localhost'
     dbuser = 'root'
-    dbpassword = 'Skipper2605'
+    dbpassword = 'Sk!pper2605'
     dbname = 'civil_crime_database'
 
 

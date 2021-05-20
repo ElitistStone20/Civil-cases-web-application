@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_mysqldb import MySQL
 import config
 import os
-from static.views.views import Login, Barrister, Solicitor, Court, Admin, execute_command, select_record, sort_tuple, binary_search, get_unfinished_cases
+from static.views.views import Login, Barrister, Solicitor, Court, Admin, execute_command, select_record, sort_tuple, search_tuple, get_unfinished_cases
 
 app = Flask(__name__)
 
@@ -31,7 +31,9 @@ def index():
 
 @app.route('/admin', methods=['GET','POST'])
 def admin():  
-    admin = Admin()   
+    admin = Admin()  
+    if request.method == 'POST' and "save" in request.form['submit']:
+        admin.handle_form_post_requests(mysql, request.form) 
     barristers = sort_tuple(select_record(mysql, "SELECT * FROM barristers"), 0)
     courts = sort_tuple(select_record(mysql, "SELECT * FROM courts"), 1)
     solicitors = sort_tuple(select_record(mysql, "SELECT * FROM solicitors"), 0)
@@ -41,19 +43,18 @@ def admin():
 
     if request.method == 'POST': 
         if request.form['submit'] == "search-barristers":
-            barristers = (binary_search(list(barristers), 0, len(barristers)-1, request.form['search-barrister'], 0),)
+            barristers = (search_tuple(list(barristers), request.form['search-barrister'], 0),)
         elif request.form['submit'] == "search-solicitors":
-            solicitors = (binary_search(list(solicitors), 0, len(solicitors)-1, request.form['search-solicitors'], 0),)
+            solicitors = (search_tuple(list(solicitors), request.form['search-solicitors'], 0),)
         elif request.form['submit'] == "search-courts":
-            courts = (binary_search(list(courts), 0, len(courts)-1, request.form['search-courts'], 1),)
+            courts = (search_tuple(list(courts), request.form['search-courts'], 1),)
         elif request.form['submit'] == "search-addresses":
             addresses = (admin.search_addresses(addresses, request.form['search-addresses']),)
         elif request.form['submit'] == "search-cases":
-            cases = (binary_search(list(cases), 0, len(cases)-1, request.form['search-cases'], 0),)
+            cases = (search_tuple(list(cases), request.form['search-cases'], 0),)
         elif request.form['submit'] == "search-clients":
             clients = (admin.search_clients(clients, request.form['search-clients']),)
-        else:      
-            admin.handle_form_post_requests(mysql, request.form)
+            
     return render_template("adminDashboard.html", barristers=barristers, courts=courts, 
                             solicitors=solicitors, cases=cases, addresses=addresses, 
                             court_options=admin.court_options, clients=clients, layout="layout.html")
@@ -70,17 +71,9 @@ def court(id):
 
     if request.method == 'POST':           
         if request.form['submit'] == "search-assigned-cases":                  
-            index = binary_search(list(court_cases), 0, len(court_cases)-1, request.form['search-case'], 0)          
-            if index != -1:     
-                court_cases = (court_cases[index], )                              
-            else:              
-                court_cases = ()
+            court_cases = (search_tuple(list(court_cases), request.form['search-case'], 0),)                     
         elif request.form['submit'] == "search-cases":
-            index = binary_search(list(all_cases), 0, len(all_cases)-1, request.form['search-case'], 0)
-            if index != -1:
-                all_cases = (all_cases[index], )
-            else:
-                all_cases = ()
+             all_cases = (search_tuple(list(all_cases), request.form['search-case'], 0),)        
         elif request.form['submit'] == "case-save":
             court.save_Case(mysql, request.form, id)
  
@@ -100,18 +93,9 @@ def barrister(id):
     
     if request.method == 'POST':
         if request.form['submit'] == "search-assigned-cases":
-            index = binary_search(list(barrister_cases), 0, len(barrister_cases)-1, request.form['search-case'], 0)
-            if index != -1:
-                barrister_cases = (barrister_cases[index], )
-            else:
-                barrister_cases = ()
+            barrister_cases = (search_tuple(list(barrister_cases), request.form['search-case'], 0),)        
         elif request.form['submit'] == "search-cases":
-            index = binary_search(list(cases), 0, len(cases)-1, request.form['search-case'], 0)
-            if index != -1:
-                cases = (cases[index], )
-            else:
-                cases = ()
-
+            cases = (search_tuple(list(cases), request.form['search-case'], 0),)
     return render_template("bar_sol_Dashboard.html", cases=cases, user_cases=barrister_cases, 
                             unfinished=unfinished, Dashboard_Type="Barrister Dashboard", 
                             solicitors=solicitors, clients=clients, courts=courts, layout="layout.html")
@@ -128,13 +112,13 @@ def solicitor(id):
 
     if request.method == 'POST':
         if request.form['submit'] == "search-assigned-cases":
-            index = binary_search(list(solicitor_cases), 0, len(solicitor_cases)-1, request.form['search-case'], 0)
+            index = search_tuple(list(solicitor_cases), request.form['search-case'], 0)
             if index != -1:
                 solicitor_cases = (solicitor_cases[index], )
             else:
                 solicitor_cases = ()
         elif request.form['submit'] == "search-cases":
-            index = binary_search(list(all_cases), 0, len(all_cases)-1, request.form['search-case'], 0)
+            index = search_tuple(list(all_cases), request.form['search-case'], 0)
             if index != -1:
                 all_cases = (all_cases[index], )
             else:

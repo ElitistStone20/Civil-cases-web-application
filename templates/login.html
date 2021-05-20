@@ -27,8 +27,8 @@
             </form>
             <form id="register" class="input-group" onsubmit="return(validate());" method="POST">
                 <input type="text" class="input-field" title="Enter your unique identification number" id="identification" name="identification" placeholder="Identification Number" required>                                            
-                <input type="text" class="input-field" title="Enter a password of your choice here" id="password-main" name="password-main" placeholder="Password" required>     
-                <input type="text" class="input-field" title="Re-type your password to ensure they match" id="password-verify" name="password-verify" placeholder="Verify Password" required>   
+                <input type="password" class="input-field" title="Enter a password of your choice here" id="password-main" name="password-main" placeholder="Password" required>     
+                <input type="password" class="input-field" title="Re-type your password to ensure they match" id="password-verify" name="password-verify" placeholder="Verify Password" required>   
                 <input type="text" class="input-field" id="combobox" name="combobox" placeholder="Select option from the list below" onchange="check_type_change()" required>  
                 <select name="register-list" class="input-field" id="selection_box" onchange="combo(this, 'combobox')">                    
                     <option>Barrister</option>

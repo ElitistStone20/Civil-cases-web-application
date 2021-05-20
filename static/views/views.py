@@ -1,6 +1,7 @@
 import hashlib
 import sys
 from flask import url_for, abort
+import static.views.NLP as nlp
 
 # Recursive quick sort function
 def sort_tuple(items, column_num):
@@ -28,19 +29,12 @@ def sort_tuple(items, column_num):
     quicksort(array_items, 0, len(array_items)-1)
     return tuple(array_items)
 
-#Recursive binary search
-def binary_search(array, low, high, search_item, column_num):
+#Linear search of a tuple
+def search_tuple(array, search_item, column_num):
     try:
-        # Check base case
-        if high >= low:
-            mid = (high + low) // 2
-            # if item is in mid location
-            if str(array[mid][column_num]) == search_item:
-                return mid
-            elif str(array[mid][column_num]) > search_item:
-                return binary_search(array, low, mid - 1, search_item, column_num)
-            else:
-                return binary_search(array, mid+1, high, search_item, column_num)     
+        for i in range(0, len(array)):        
+            if str(array[i][column_num]) == str(search_item):                
+                return array[i]           
     except Exception as e:
         print(e)
     return -1
@@ -62,12 +56,10 @@ def execute_command(mysql, query):
 def get_unfinished_cases(cases):
         unfinished = 0
         for case in cases:
-            if case[2] is not "Resolved":
+            if case[2] != "Resolved":
                 unfinished += 1
         return unfinished
 
-def search_array(self, array, search_item, column):
-    return
 
 # Class to generate a SHA3 hash of an input value
 class SHA3Hash(object):
@@ -81,28 +73,32 @@ class SHA3Hash(object):
 class Login(object):
     # Validate any login attemtp by getting all user accounts that match the idenfification code entered
     def validate_login(self, identification, password, mysql):
-        cursor = mysql.connection.cursor()
-        cursor.execute("SELECT username, password, type FROM admin_accounts WHERE username = %s", [identification])                      
-        data = cursor.fetchall()  
-        cursor.execute("SELECT username, password, court_id, type FROM courts WHERE username = %s", [identification])
-        data = data + cursor.fetchall()
-        cursor.execute("SELECT bar_council_num, password, type FROM barristers WHERE bar_council_num = %s", [identification]) 
-        data = data + cursor.fetchall()
-        cursor.execute("SELECT solicitor_reference_id, password, type FROM solicitors WHERE solicitor_reference_id = %s", [identification])
-        data = data + cursor.fetchall()
-        cursor.close()     
-        sha = SHA3Hash()
-        if len(data) >= 1: 
-            if str(data[0][0]) == identification and data[0][1] == sha.get_hash(password):            
-                if data[0][-1] == "ADM":
-                    return url_for('admin')
-                elif data[0][-1] == "BAR":
-                    return url_for('barrister', id=data[0][0])
-                elif data[0][-1] == "SOL":
-                    return url_for('solicitor', id=data[0][0])
-                elif data[0][-1] == "CRT":
-                    return url_for('court', id=data[0][2])
-        return url_for('index')             
+        try:
+            cursor = mysql.connection.cursor()
+            cursor.execute("SELECT username, password, type FROM admin_accounts WHERE username = %s", [identification])                      
+            data = cursor.fetchall()  
+            cursor.execute("SELECT username, password, court_id, type FROM courts WHERE username = %s", [identification])
+            data = data + cursor.fetchall()
+            cursor.execute("SELECT bar_council_num, password, type FROM barristers WHERE bar_council_num = %s", [identification]) 
+            data = data + cursor.fetchall()
+            cursor.execute("SELECT solicitor_reference_id, password, type FROM solicitors WHERE solicitor_reference_id = %s", [identification])
+            data = data + cursor.fetchall()
+            cursor.close()     
+            sha = SHA3Hash()
+            if len(data) >= 1: 
+                if str(data[0][0]) == identification and data[0][1] == sha.get_hash(password):            
+                    if data[0][-1] == "ADM":
+                        return url_for('admin')
+                    elif data[0][-1] == "BAR":
+                        return url_for('barrister', id=data[0][0])
+                    elif data[0][-1] == "SOL":
+                        return url_for('solicitor', id=data[0][0])
+                    elif data[0][-1] == "CRT":
+                        return url_for('court', id=data[0][2])
+            return url_for('index')             
+        except Exception as ex:
+            print(ex)
+        return url_for('index')
            
 
     def register_barrister(self, form, cursor, mysql):    
@@ -191,7 +187,7 @@ class Admin(object):
             if full_client_name == client_full:
                 return client        
         return ()
-   
+
     # Handles post requests from the browser
     def handle_form_post_requests(self, mysql, form):
         def check_for_hash(fieldname):
@@ -242,11 +238,12 @@ class Admin(object):
         elif form['submit'] == 'court-save':
             data = select_record(mysql, "SELECT * FROM courts WHERE court_id = {0}".format(form['court-id']))
             if len(data) > 0:
-                execute_command(mysql, "UPDATE courts SET court_name='{0}', username='{1}', password='{2}', court_type='{3}'".format(
+                execute_command(mysql, "UPDATE courts SET court_name='{0}', username='{1}', password='{2}', court_type='{3}' WHERE court_id = {4}".format(
                     form['court-name'], 
                     form['court-username'], 
                     check_for_hash('court-password'), 
-                    form['court-type']
+                    form['court-type'],
+                    form['court-id']
                 ))
             else:
                 execute_command(mysql, "INSERT INTO courts VALUES ('{0}', '{1}', '{2}', '{3}', 0, 'CRT')".format(
@@ -292,7 +289,18 @@ class Admin(object):
                     form['claim-id']           
                 ))
             else:
-                print("Not implemented yet!")  
+                description = nlp.classify(form['case-description'])
+                execute_command(mysql, "INSERT INTO cases VALUES ({0}, '{1}', '{2}', {3}, {4}, '{5}', '{6}', '{7}')".format(
+                    form['claim-id'],
+                    form['case-title'],
+                    form['case-status'],
+                    form['case-start-date'],
+                    form['case-end-date'],
+                    description,
+                    form['case-result'],
+                    form['case-type']   
+                ))            
+
 
 # Functions for Barrister's webpage
 class Barrister(object):    
